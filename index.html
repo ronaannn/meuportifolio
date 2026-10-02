@@ -165,7 +165,6 @@
 <body class="relative antialiased selection:bg-white selection:text-black">
 
     <div id="bg-container" class="absolute inset-0 z-0">
-        <!-- O decoding="async" liberta o processador para não travar a roleta -->
         <img id="bg-img-1" class="bg-layer opacity-100" src="" alt="" decoding="async">
         <img id="bg-img-2" class="bg-layer opacity-0" src="" alt="" decoding="async">
         <video id="bg-video" class="bg-layer opacity-0 object-cover w-full h-full absolute inset-0 z-0 transition-opacity duration-1000" autoplay loop muted playsinline></video>
@@ -266,13 +265,15 @@
                             { url: "VINO_2.jpg", time: 3000 }
                             ]
                     },
-                   { 
+                    { 
                         name: "danzo", 
                         images: [
                             { url: "DANZO_1.jpg", time: 3000 },
                             { url: "DANZO_2.jpg", time: 3000 }
-                ]
-            },
+                        ]
+                    }
+                ] // <-- ESTE COLCHETE ESTAVA FALTANDO PARA FECHAR OS "projects"
+            }, // <-- ESTA CHAVE ESTAVA FALTANDO PARA FECHAR A CATEGORIA "SHOW"
             {
                 categoryTitle: "DOCUMENTÁRIO",
                 projects: [
@@ -427,7 +428,6 @@
         }
 
         function playMedia() {
-            // Anula os comandos de imagens pendentes das páginas anteriores
             slideStateId++; 
             currentImageRequest++; 
             clearTimeout(slideTimeout);
@@ -435,7 +435,6 @@
             const pIndex = currentProjIndex >= 0 ? currentProjIndex : 0;
             const proj = portfolioData[currentCatIndex].projects[pIndex];
             
-            // Força a começar sempre na primeira imagem ao mudar de projeto
             currentImageIndex = 0; 
             
             if (proj.videoLocal) {
@@ -460,14 +459,11 @@
         }
 
         function changeImage(url) {
-            // Atualiza o bilhete (ID) do pedido. Só a última imagem pedida é que terá o ID válido
             currentImageRequest++;
             const requestId = currentImageRequest;
 
-            // O Segredo: Carrega a imagem invisível na memória
             const img = new Image();
             img.onload = () => {
-                // Se entretanto o utilizador deslizou para outra categoria, descarta esta imagem!
                 if (requestId !== currentImageRequest) return;
 
                 if (activeBgLayer === 1) {
@@ -506,7 +502,6 @@
             const duration = currentImgData.time || 4000;
 
             slideTimeout = setTimeout(() => {
-                // Se a categoria foi mudada durante o tempo de espera, desliga o ciclo!
                 if (stateId !== slideStateId) return;
 
                 currentImageIndex = (currentImageIndex + 1) % proj.images.length;
@@ -595,7 +590,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             initList();
             
-            // O carregamento inicial também usa a mesma lógica imune a atrasos
             const firstProj = portfolioData[0].projects[0];
             const firstImgData = firstProj.images[0];
             const firstUrl = typeof firstImgData === 'string' ? firstImgData : firstImgData.url;
