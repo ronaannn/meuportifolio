@@ -3,7 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio - Direção de Fotografia</title>
+    
+    <!-- Título Principal -->
+    <title>Ronã Grangeiro | Direção de Fotografia</title>
+    
+    <!-- Otimização para Motores de Busca (SEO) -->
+    <meta name="description" content="Portfólio de Ronã Grangeiro, Diretor de Fotografia graduado em Cinema. Especializado em curtas-metragens, videoclipes e fashion films.">
+    <meta name="author" content="Ronã Grangeiro">
+
+    <!-- Open Graph / Redes Sociais (WhatsApp, LinkedIn, etc.) -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ronaannn.github.io/">
+    <meta property="og:title" content="Ronã Grangeiro | Direção de Fotografia">
+    <meta property="og:description" content="Portfólio de Ronã Grangeiro, Diretor de Fotografia graduado em Cinema. Especializado em curtas-metragens, videoclipes e fashion films.">
+    <!-- Imagem que vai aparecer na miniatura do WhatsApp (Usa o link absoluto do GitHub) -->
+    <meta property="og:image" content="https://ronaannn.github.io/1_2.1.1.png">
+
+    <!-- Favicon (Ícone na aba do navegador) -->
+    <link rel="icon" type="image/png" href="favicon.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,13 +44,12 @@
         .font-elegant { font-family: 'Cinzel', serif; }
 
         .roulette-item {
-            /* Animação ultra fluida com cubic-bezier mais suave */
             transition: opacity 0.8s ease, transform 1s cubic-bezier(0.22, 1, 0.36, 1);
             opacity: 0.15;
             padding-top: 1rem;
             padding-bottom: 1rem;
             transform-origin: left center;
-            will-change: transform, opacity; /* Prepara a placa de vídeo */
+            will-change: transform, opacity; 
         }
         .roulette-item.active {
             opacity: 1;
@@ -45,7 +62,6 @@
         .sub-projects {
             max-height: 0;
             overflow: hidden;
-            /* A gaveta abre sincronizada com a roleta */
             transition: max-height 1s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease;
             opacity: 0;
             margin-top: 0;
@@ -76,7 +92,6 @@
         }
 
         #roulette-list {
-            /* O coração da fluidez da lista principal */
             transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1);
             position: absolute;
             top: 0;
@@ -85,7 +100,7 @@
             list-style: none;
             padding: 0;
             margin: 0;
-            will-change: transform; /* Força aceleração de Hardware (GPU) */
+            will-change: transform; 
         }
 
         .bg-layer {
@@ -147,15 +162,15 @@
                     { 
                         name: "libervita", 
                         images: [
-                            "",
-                            ""
+                            "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070&auto=format&fit=crop",
+                            "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=1976&auto=format&fit=crop"
                         ] 
                     },
                     { 
                         name: "micélio", 
                         images: [
-                            "",
-                            ""
+                            "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1920&auto=format&fit=crop",
+                            "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop"
                         ] 
                     }
                 ]
@@ -166,8 +181,8 @@
                     { 
                         name: "stand-it", 
                         images: [
-                            "",
-                            ""
+                            "https://images.unsplash.com/photo-1519608487953-e999c86e7455?q=80&w=2070&auto=format&fit=crop",
+                            "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop"
                         ] 
                     }
                 ]
@@ -187,11 +202,11 @@
             {
                 categoryTitle: "SHOW",
                 projects: [
-                    { name: "kyan", images: [""] },
-                    { name: "kayblack", images: [""] },
-                    { name: "sá e guarabyra", images: [""] },
-                    { name: "yunk vino", images: [""] },
-                    { name: "danzo", images: [""] }
+                    { name: "kyan", images: ["https://images.unsplash.com/photo-1540039155733-d76e6f48ce65?q=80&w=2070&auto=format&fit=crop"] },
+                    { name: "kayblack", images: ["https://images.unsplash.com/photo-1470229722913-7c092b321a1b?q=80&w=2070&auto=format&fit=crop"] },
+                    { name: "sá e guarabyra", images: ["https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1974&auto=format&fit=crop"] },
+                    { name: "yunk vino", images: ["https://images.unsplash.com/photo-1520166012956-add9ba0ee3f4?q=80&w=2070&auto=format&fit=crop"] },
+                    { name: "danzo", images: ["https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop"] }
                 ]
             },
             {
@@ -200,8 +215,8 @@
                     { 
                         name: "pertencer", 
                         images: [
-                            "",
-                            ""
+                            "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=2070&auto=format&fit=crop",
+                            "https://images.unsplash.com/photo-1604085572504-a392ddf0d86a?q=80&w=2070&auto=format&fit=crop"
                         ] 
                     }
                 ]
@@ -278,11 +293,9 @@
 
             Array.from(items).forEach((item, idx) => {
                 const scale = idx === currentCatIndex ? 1 : 0.85;
-                // Uso do translate3d para forçar aceleração por Hardware na GPU
                 item.style.transform = `scale(${scale})`;
             });
 
-            // Aplica a transição vertical acelerada por hardware
             listEl.style.transform = `translate3d(0, ${translateY}px, 0)`;
 
             const currentCat = portfolioData[currentCatIndex];
@@ -396,7 +409,6 @@
                 isAnimatingScroll = true;
                 selectCategory(currentCatIndex - 1);
             }
-            // Sincronizado para 1000ms (1 segundo) que é o novo tempo da animação CSS
             setTimeout(() => { isAnimatingScroll = false; }, 1000); 
         }
 
