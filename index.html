@@ -243,11 +243,11 @@
             {
                 categoryTitle: "SHOW",
                 projects: [
-                    { name: "kyan", images: [
-                        { url: "KYAN 1.jpg", time 3000},
-                        { url: "KYAN 2.jpg", time 3000},
-                        { url: "KYAN 3.jpg", time 3000}
-                    ] },
+                    { 
+                        name: "kyan", 
+                        /* AQUI ESTÃO AS SUAS 3 FOTOS NOVAS NO PROJETO DO KYAN */
+                        images: ["KYAN 1.jpg", "KYAN 2.jpg", "KYAN 3.jpg"] 
+                    },
                     { name: "kayblack", images: ["https://images.unsplash.com/photo-1470229722913-7c092b321a1b?q=80&w=2070&auto=format&fit=crop"] },
                     { name: "sá e guarabyra", images: ["https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1974&auto=format&fit=crop"] },
                     { name: "yunk vino", images: ["https://images.unsplash.com/photo-1520166012956-add9ba0ee3f4?q=80&w=2070&auto=format&fit=crop"] },
@@ -323,7 +323,6 @@
                     
                     if (isContact) {
                         liSub.classList.add('contact-item');
-                        // A MÁGICA DO LOOP: Atribui um atraso de 2 segundos para cada item tremer um a seguir ao outro!
                         liSub.style.animationDelay = `${pIndex * 2}s`;
                     }
                     
@@ -331,7 +330,6 @@
                     liSub.onclick = (e) => {
                         e.stopPropagation(); 
                         
-                        // Abre imediatamente o link se existir
                         if (proj.link) {
                             if (proj.link.startsWith('mailto:')) {
                                 window.location.href = proj.link;
@@ -340,7 +338,6 @@
                             }
                         }
                         
-                        // Fica selecionado como feedback visual
                         selectProject(cIndex, pIndex);
                     };
                     ulSub.appendChild(liSub);
@@ -374,7 +371,6 @@
                     }
 
                     subItems.forEach((sub, sIdx) => {
-                        // Só adiciona o active-sub se o currentProjIndex bater (No contato ele começa no -1)
                         if (sIdx === currentProjIndex) sub.classList.add('active-sub');
                         else sub.classList.remove('active-sub');
                     });
@@ -396,7 +392,6 @@
 
             const currentCat = portfolioData[currentCatIndex];
             
-            // Lógica para esconder o contador e limpar o subtítulo se for o contato sem seleção
             if (currentCat.categoryTitle === "CONTATO") {
                 counterEl.style.opacity = '0';
                 nameDisplayEl.textContent = ""; 
@@ -409,7 +404,6 @@
         }
 
         function playMedia() {
-            // Se o índice for -1 (Contato não selecionado), ele usa o fundo do primeiro item ([0])
             const pIndex = currentProjIndex >= 0 ? currentProjIndex : 0;
             const proj = portfolioData[currentCatIndex].projects[pIndex];
             
@@ -455,7 +449,6 @@
 
         function startSlideshow() {
             clearTimeout(slideTimeout); 
-            // Usa o fallback para não dar erro se nenhum estiver selecionado
             const pIndex = currentProjIndex >= 0 ? currentProjIndex : 0;
             const proj = portfolioData[currentCatIndex].projects[pIndex];
             
@@ -486,7 +479,6 @@
             if (cIndex === currentCatIndex) return; 
             currentCatIndex = cIndex;
             
-            // O SEGREDINHO: Se for a aba de contato, define como -1 para nenhum ficar selecionado!
             if (portfolioData[cIndex].categoryTitle === "CONTATO") {
                 currentProjIndex = -1;
             } else {
@@ -504,7 +496,6 @@
         }
 
         function selectProject(cIndex, pIndex) {
-            // Se já está selecionado, apenas sai (o clique no link já foi tratado na origem)
             if (cIndex === currentCatIndex && pIndex === currentProjIndex) return;
             
             currentCatIndex = cIndex;
