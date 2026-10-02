@@ -78,7 +78,6 @@
             margin-top: 0.5rem;
         }
         
-        /* ESTILO PADRÃO DOS PROJETOS */
         .sub-project-item {
             font-family: 'Inter', sans-serif;
             font-size: 1.1rem;
@@ -98,7 +97,6 @@
             color: #ccc;
         }
 
-        /* --- ANIMAÇÃO DE TREMER (CHAMADA PARA AÇÃO) --- */
         @keyframes tremble {
             0%, 100% { transform: translateX(0) rotate(0); }
             2% { transform: translateX(-3px) rotate(-1deg); }
@@ -108,7 +106,6 @@
             10% { transform: translateX(0) rotate(0); }
         }
 
-        /* ESTILO EXCLUSIVO PARA OS LINKS DE CONTATO */
         .sub-project-item.contact-item {
             font-size: 1.5rem; 
             text-transform: none; 
@@ -116,7 +113,6 @@
             font-weight: 400;
             padding: 0.6rem 0; 
             color: #aaa;
-            
             display: block;
             width: fit-content;
             transform-origin: left center;
@@ -169,9 +165,9 @@
 <body class="relative antialiased selection:bg-white selection:text-black">
 
     <div id="bg-container" class="absolute inset-0 z-0">
-        <!-- O alt="" vazio evita que o texto apareça caso a imagem demore 1 segundo a carregar -->
-        <img id="bg-img-1" class="bg-layer opacity-100" src="" alt="">
-        <img id="bg-img-2" class="bg-layer opacity-0" src="" alt="">
+        <!-- O decoding="async" liberta o processador para não travar a roleta -->
+        <img id="bg-img-1" class="bg-layer opacity-100" src="" alt="" decoding="async">
+        <img id="bg-img-2" class="bg-layer opacity-0" src="" alt="" decoding="async">
         <video id="bg-video" class="bg-layer opacity-0 object-cover w-full h-full absolute inset-0 z-0 transition-opacity duration-1000" autoplay loop muted playsinline></video>
         <div class="overlay"></div>
     </div>
@@ -190,7 +186,6 @@
         </main>
 
         <div class="absolute bottom-8 right-8 md:right-12 z-30 pointer-events-auto text-right">
-            <!-- Limpo o HTML hardcoded para evitar bugs visuais durante o carregamento -->
             <div id="project-counter" class="text-sm font-light tracking-widest mb-1"></div>
             <div id="project-name-display" class="text-xs text-gray-400 tracking-[0.2em] uppercase"></div>
         </div>
@@ -235,7 +230,7 @@
                     { 
                         name: "sonhos", 
                         images: [
-                            { url: "1_2.1.1.png", time: 7000 }, 
+                            { url: "1_2.1.1.png", time: 3000 }, 
                             { url: "2.png", time: 3000 }
                         ] 
                     }
@@ -294,6 +289,10 @@
         let activeBgLayer = 1;
         let slideTimeout; 
         let isAnimatingScroll = false;
+
+        // IDs para gerir downloads e temporizadores sem causar misturas
+        let currentImageRequest = 0;
+        let slideStateId = 0;
 
         const listEl = document.getElementById('roulette-list');
         const bgImg1 = document.getElementById('bg-img-1');
@@ -404,11 +403,18 @@
         }
 
         function playMedia() {
+            // Anula os comandos de imagens pendentes das páginas anteriores
+            slideStateId++; 
+            currentImageRequest++; 
+            clearTimeout(slideTimeout);
+
             const pIndex = currentProjIndex >= 0 ? currentProjIndex : 0;
             const proj = portfolioData[currentCatIndex].projects[pIndex];
             
+            // Força a começar sempre na primeira imagem ao mudar de projeto
+            currentImageIndex = 0; 
+            
             if (proj.videoLocal) {
-                clearTimeout(slideTimeout);
                 if (!bgVideo.src.endsWith(proj.videoLocal)) {
                     bgVideo.src = proj.videoLocal;
                 }
@@ -430,34 +436,45 @@
         }
 
         function changeImage(url) {
-            if (activeBgLayer === 1) {
-                bgImg2.src = url;
-                bgImg2.classList.remove('opacity-0');
-                bgImg2.classList.add('opacity-100');
-                bgImg1.classList.remove('opacity-100');
-                bgImg1.classList.add('opacity-0');
-                activeBgLayer = 2;
-            } else {
-                bgImg1.src = url;
-                bgImg1.classList.remove('opacity-0');
-                bgImg1.classList.add('opacity-100');
-                bgImg2.classList.remove('opacity-100');
-                bgImg2.classList.add('opacity-0');
-                activeBgLayer = 1;
-            }
+            // Atualiza o bilhete (ID) do pedido. Só a última imagem pedida é que terá o ID válido
+            currentImageRequest++;
+            const requestId = currentImageRequest;
+
+            // O Segredo: Carrega a imagem invisível na memória
+            const img = new Image();
+            img.onload = () => {
+                // Se entretanto o utilizador deslizou para outra categoria, descarta esta imagem!
+                if (requestId !== currentImageRequest) return;
+
+                if (activeBgLayer === 1) {
+                    bgImg2.src = url;
+                    bgImg2.classList.remove('opacity-0');
+                    bgImg2.classList.add('opacity-100');
+                    bgImg1.classList.remove('opacity-100');
+                    bgImg1.classList.add('opacity-0');
+                    activeBgLayer = 2;
+                } else {
+                    bgImg1.src = url;
+                    bgImg1.classList.remove('opacity-0');
+                    bgImg1.classList.add('opacity-100');
+                    bgImg2.classList.remove('opacity-100');
+                    bgImg2.classList.add('opacity-0');
+                    activeBgLayer = 1;
+                }
+            };
+            img.src = url;
         }
 
         function startSlideshow() {
-            clearTimeout(slideTimeout); 
             const pIndex = currentProjIndex >= 0 ? currentProjIndex : 0;
             const proj = portfolioData[currentCatIndex].projects[pIndex];
             
             if (!proj.videoLocal && proj.images.length > 1) {
-                scheduleNextImage();
+                scheduleNextImage(slideStateId);
             }
         }
 
-        function scheduleNextImage() {
+        function scheduleNextImage(stateId) {
             const pIndex = currentProjIndex >= 0 ? currentProjIndex : 0;
             const proj = portfolioData[currentCatIndex].projects[pIndex];
             const currentImgData = proj.images[currentImageIndex];
@@ -465,13 +482,16 @@
             const duration = currentImgData.time || 4000;
 
             slideTimeout = setTimeout(() => {
+                // Se a categoria foi mudada durante o tempo de espera, desliga o ciclo!
+                if (stateId !== slideStateId) return;
+
                 currentImageIndex = (currentImageIndex + 1) % proj.images.length;
                 const nextImgData = proj.images[currentImageIndex];
                 
                 const nextUrl = typeof nextImgData === 'string' ? nextImgData : nextImgData.url;
                 
                 changeImage(nextUrl);
-                scheduleNextImage(); 
+                scheduleNextImage(stateId); 
             }, duration);
         }
 
@@ -484,8 +504,6 @@
             } else {
                 currentProjIndex = 0; 
             }
-            
-            currentImageIndex = 0;
             
             if (navigator.vibrate) navigator.vibrate(30);
             
@@ -500,7 +518,6 @@
             
             currentCatIndex = cIndex;
             currentProjIndex = pIndex;
-            currentImageIndex = 0;
             
             if (navigator.vibrate) navigator.vibrate(30);
 
@@ -551,14 +568,16 @@
             }
         }
 
-        // AGORA O SCRIPT RODA IMEDIATAMENTE ASSIM QUE O CÓDIGO É LIDO!
         document.addEventListener('DOMContentLoaded', () => {
             initList();
             
+            // O carregamento inicial também usa a mesma lógica imune a atrasos
             const firstProj = portfolioData[0].projects[0];
-            const bgImg1 = document.getElementById('bg-img-1');
+            const firstImgData = firstProj.images[0];
+            const firstUrl = typeof firstImgData === 'string' ? firstImgData : firstImgData.url;
+            
             if (!firstProj.videoLocal) {
-                bgImg1.src = typeof firstProj.images[0] === 'string' ? firstProj.images[0] : firstProj.images[0].url;
+                changeImage(firstUrl);
             }
             
             setTimeout(() => {
