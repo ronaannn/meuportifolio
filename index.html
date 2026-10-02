@@ -170,7 +170,11 @@
                 projects: [
                     { 
                         name: "sonhos", 
-                        images: ["1_2.1.1.png", "2.png"] 
+                        images: [
+                            // Podes usar este formato para definir o tempo de cada uma! (1000 = 1 segundo)
+                            { url: "1_2.1.1.png", time: 5000 }, 
+                            { url: "2.png", time: 2000 }
+                        ] 
                     }
                 ]
             },
@@ -202,7 +206,7 @@
         let currentProjIndex = 0;
         let currentImageIndex = 0;
         let activeBgLayer = 1;
-        let slideInterval;
+        let slideTimeout; // Modificado de Interval para Timeout
         let isAnimatingScroll = false;
 
         const listEl = document.getElementById('roulette-list');
@@ -283,7 +287,7 @@
             const proj = portfolioData[currentCatIndex].projects[currentProjIndex];
             
             if (proj.videoLocal) {
-                clearInterval(slideInterval);
+                clearTimeout(slideTimeout);
                 if (!bgVideo.src.endsWith(proj.videoLocal)) {
                     bgVideo.src = proj.videoLocal;
                 }
@@ -296,12 +300,15 @@
                     if (bgVideo.classList.contains('opacity-0')) bgVideo.src = ""; 
                 }, 1000);
                 
-                changeImage(proj.images[0]);
+                // Trata a imagem para caso seja um objeto com tempo ou só o nome direto
+                const firstImg = proj.images[0];
+                const firstUrl = typeof firstImg === 'string' ? firstImg : firstImg.url;
+                
+                changeImage(firstUrl);
                 startSlideshow();
             }
         }
 
-        // --- FORÇANDO A TROCA DE IMAGEM SEM TRAVAS DE SEGURANÇA ---
         function changeImage(url) {
             if (activeBgLayer === 1) {
                 bgImg2.src = url;
@@ -320,17 +327,35 @@
             }
         }
 
+        // --- NOVO SISTEMA DE TEMPO DINÂMICO ---
         function startSlideshow() {
-            clearInterval(slideInterval);
+            clearTimeout(slideTimeout); // Limpa contagens anteriores
             const proj = portfolioData[currentCatIndex].projects[currentProjIndex];
-            // Só ativa o intervalo se tiver mais de uma imagem
+            
             if (!proj.videoLocal && proj.images.length > 1) {
-                slideInterval = setInterval(() => {
-                    currentImageIndex = (currentImageIndex + 1) % proj.images.length;
-                    changeImage(proj.images[currentImageIndex]);
-                }, 4000); // Força a troca a cada 4 segundos
+                scheduleNextImage();
             }
         }
+
+        function scheduleNextImage() {
+            const proj = portfolioData[currentCatIndex].projects[currentProjIndex];
+            const currentImgData = proj.images[currentImageIndex];
+            
+            // Lê o tempo da imagem atual (ou usa 4000 como padrão caso não tenha sido definido)
+            const duration = currentImgData.time || 4000;
+
+            slideTimeout = setTimeout(() => {
+                currentImageIndex = (currentImageIndex + 1) % proj.images.length;
+                const nextImgData = proj.images[currentImageIndex];
+                
+                // Extrai o link (independentemente de ser objeto de tempo ou string normal)
+                const nextUrl = typeof nextImgData === 'string' ? nextImgData : nextImgData.url;
+                
+                changeImage(nextUrl);
+                scheduleNextImage(); // Inicia a contagem para a imagem seguinte
+            }, duration);
+        }
+        // --------------------------------------
 
         function selectCategory(cIndex) {
             if (cIndex === currentCatIndex) return; 
@@ -398,6 +423,14 @@
 
         window.addEventListener('load', () => {
             initList();
+            
+            // Carrega a primeira imagem de forma segura verificando o tipo
+            const firstProj = portfolioData[0].projects[0];
+            const bgImg1 = document.getElementById('bg-img-1');
+            if (!firstProj.videoLocal) {
+                bgImg1.src = typeof firstProj.images[0] === 'string' ? firstProj.images[0] : firstProj.images[0].url;
+            }
+            
             setTimeout(() => {
                 updateRoulettePosition();
                 playMedia();
