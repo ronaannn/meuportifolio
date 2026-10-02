@@ -98,8 +98,6 @@
             z-index: 10;
         }
 
-        /* --- MÁSCARA DE ESMAECIMENTO (FADE VERTICAL) --- */
-        /* Faz os textos sumirem antes de baterem no topo e no rodapé */
         .mask-vertical {
             -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 15%, rgba(0,0,0,1) 30%, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 85%, rgba(0,0,0,0) 100%);
             mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 15%, rgba(0,0,0,1) 30%, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 85%, rgba(0,0,0,0) 100%);
@@ -117,20 +115,17 @@
 
     <div class="relative z-20 w-full h-full flex flex-col pointer-events-none">
         
-        <!-- Cabeçalho (Z-index alto para ficar sempre no topo) -->
         <header class="p-8 md:p-12 absolute top-0 left-0 w-full flex justify-between items-center z-30 pointer-events-auto">
             <div class="text-xs tracking-[0.3em] uppercase font-light">Ronã <br> <span class="font-bold">Grangeiro</span></div>
             <div class="text-xs tracking-widest uppercase font-light">Portifólio</div>
         </header>
 
-        <!-- Container da Lista com a Máscara Vertical aplicada -->
         <main class="flex-1 relative w-full md:w-2/3 h-full mask-vertical z-20">
             <ul id="roulette-list" class="pointer-events-auto">
                 <!-- Injetado via JS -->
             </ul>
         </main>
 
-        <!-- Rodapé (Z-index alto) -->
         <div class="absolute bottom-8 right-8 md:right-12 z-30 pointer-events-auto text-right">
             <div id="project-counter" class="text-sm font-light tracking-widest mb-1">01 / 05</div>
             <div id="project-name-display" class="text-xs text-gray-400 tracking-[0.2em] uppercase">LIBERVITA</div>
@@ -175,7 +170,8 @@
                 projects: [
                     { 
                         name: "sonhos", 
-                        images: ["1_2.1.1.png","2.png"] 
+                        /* AMBAS AS FOTOS ADICIONADAS AQUI */
+                        images: ["1_2.1.1.png", "2.png"] 
                     }
                 ]
             },
@@ -220,11 +216,9 @@
         function initList() {
             portfolioData.forEach((cat, cIndex) => {
                 const liCat = document.createElement('li');
-                // Adiciona o espaçamento lateral (padding) correto
                 liCat.className = 'roulette-item pl-6 md:pl-16';
                 
                 const titleDiv = document.createElement('div');
-                // text-[7.5vw] faz a fonte se adaptar perfeitamente ao tamanho da tela (Viewport Width)
                 titleDiv.className = 'font-elegant text-[7.5vw] md:text-5xl lg:text-6xl tracking-widest uppercase whitespace-nowrap';
                 titleDiv.textContent = cat.categoryTitle;
                 titleDiv.onclick = () => selectCategory(cIndex);
@@ -308,25 +302,22 @@
             }
         }
 
+        /* TRAVA REMOVIDA AQUI NESTA FUNÇÃO */
         function changeImage(url) {
             if (activeBgLayer === 1) {
                 bgImg2.src = url;
-                bgImg2.onload = () => {
-                    bgImg2.classList.remove('opacity-0');
-                    bgImg2.classList.add('opacity-100');
-                    bgImg1.classList.remove('opacity-100');
-                    bgImg1.classList.add('opacity-0');
-                    activeBgLayer = 2;
-                };
+                bgImg2.classList.remove('opacity-0');
+                bgImg2.classList.add('opacity-100');
+                bgImg1.classList.remove('opacity-100');
+                bgImg1.classList.add('opacity-0');
+                activeBgLayer = 2;
             } else {
                 bgImg1.src = url;
-                bgImg1.onload = () => {
-                    bgImg1.classList.remove('opacity-0');
-                    bgImg1.classList.add('opacity-100');
-                    bgImg2.classList.remove('opacity-100');
-                    bgImg2.classList.add('opacity-0');
-                    activeBgLayer = 1;
-                };
+                bgImg1.classList.remove('opacity-0');
+                bgImg1.classList.add('opacity-100');
+                bgImg2.classList.remove('opacity-100');
+                bgImg2.classList.add('opacity-0');
+                activeBgLayer = 1;
             }
         }
 
@@ -388,16 +379,16 @@
         let touchEndY = 0;
 
         window.addEventListener('touchstart', e => {
-            touchStartY = e.changedTouches[0].screenY;
-        }, { passive: false });
+            touchStartY = e.changedTouches[0].clientY;
+        }, { passive: true });
 
         window.addEventListener('touchend', e => {
-            touchEndY = e.changedTouches[0].screenY;
+            touchEndY = e.changedTouches[0].clientY;
             handleGesture();
-        }, { passive: false });
+        }, { passive: true });
 
         function handleGesture() {
-            const swipeThreshold = 50; 
+            const swipeThreshold = 40; 
             if (touchEndY < touchStartY - swipeThreshold) {
                 handleNavigation('down'); 
             } else if (touchEndY > touchStartY + swipeThreshold) {
