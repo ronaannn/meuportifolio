@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimalist Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+    
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Fix screen, no scroll */
+            background-color: #000;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .font-elegant {
+            font-family: 'Cinzel', serif;
+        }
+
+        .roulette-item {
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            opacity: 0.2;
+            cursor: pointer;
+            transform: scale(0.9);
+            transform-origin: left center;
+        }
+
+        .roulette-item.active {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .roulette-item:hover:not(.active) {
+            opacity: 0.6;
+        }
+
+        /* Smooth transition for the vertical list */
+        #roulette-list {
+            transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .bg-layer {
+            transition: opacity 1.5s ease-in-out;
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Dark gradient overlay to ensure text readability */
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.3) 100%);
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="relative antialiased selection:bg-white selection:text-black">
+
+    <!-- Background Images Container -->
+    <div id="bg-container" class="absolute inset-0 z-0">
+        <!-- Two image layers for smooth crossfading -->
+        <img id="bg-img-1" class="bg-layer opacity-100" src="" alt="Background 1">
+        <img id="bg-img-2" class="bg-layer opacity-0" src="" alt="Background 2">
+        <div class="overlay"></div>
+    </div>
+
+    <!-- Content Overlay -->
+    <div class="relative z-20 w-full h-full flex flex-col pointer-events-none">
+        
+        <!-- Header / Logo -->
+        <header class="p-8 md:p-12 absolute top-0 left-0 w-full flex justify-between items-center z-30 pointer-events-auto">
+            <div class="text-xs tracking-[0.3em] uppercase font-light">Studio <br> <span class="font-bold">Aura</span></div>
+            <div class="text-xs tracking-widest uppercase font-light">Selected Works</div>
+        </header>
+
+        <!-- Main Roulette Area -->
+        <main class="flex-1 relative w-full md:w-1/2 pl-8 md:pl-24 lg:pl-32 h-full">
+            <!-- This list will be translated vertically -->
+            <ul id="roulette-list" class="pointer-events-auto">
+                <!-- Items injected via JS -->
+            </ul>
+        </main>
+
+        <!-- Dynamic Counter/Info (Bottom Right) -->
+        <div class="absolute bottom-8 right-12 z-30 pointer-events-auto text-right">
+            <div id="project-counter" class="text-sm font-light tracking-widest mb-1">01 / 05</div>
+            <div id="project-category" class="text-xs text-gray-400 tracking-[0.2em] uppercase">Architecture</div>
+        </div>
+    </div>
+
+    <script>
+        // Project Data with specific Unsplash high-quality image IDs for minimalist aesthetics
+        const projects = [
+            {
+                name: "Monolith",
+                category: "Architecture",
+                images: [
+                    "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=2069&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1481253127861-534498168948?q=80&w=1973&auto=format&fit=crop"
+                ]
+            },
+            {
+                name: "Noir Silhouette",
+                category: "Fashion",
+                images: [
+                    "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=1976&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1920&auto=format&fit=crop"
+                ]
+            },
+            {
+                name: "Void Elements",
+                category: "Abstract Concept",
+                images: [
+                    "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1964&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?q=80&w=1974&auto=format&fit=crop"
+                ]
+            },
+            {
+                name: "Serene Spaces",
+                category: "Interior Design",
+                images: [
+                    "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=1974&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1600607687920-4e2a09be15b5?q=80&w=2070&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1593696140826-c58b021acf8b?q=80&w=2070&auto=format&fit=crop"
+                ]
+            },
+            {
+                name: "Lumina",
+                category: "Light Art",
+                images: [
+                    "https://images.unsplash.com/photo-1550684376-efcbd6e3f031?q=80&w=2070&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1519608487953-e999c86e7455?q=80&w=2070&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop"
+                ]
+            }
+        ];
+
+        let currentProjectIndex = 0;
+        let currentImageIndex = 0;
+        let activeBgLayer = 1; // 1 or 2 to manage crossfades
+        let slideInterval;
+
+        const listEl = document.getElementById('roulette-list');
+        const bgImg1 = document.getElementById('bg-img-1');
+        const bgImg2 = document.getElementById('bg-img-2');
+        const counterEl = document.getElementById('project-counter');
+        const categoryEl = document.getElementById('project-category');
+
+        // Initialize the list
+        function initList() {
+            projects.forEach((proj, index) => {
+                const li = document.createElement('li');
+                // Give items large spacing so the roulette feel is emphasized
+                li.className = `roulette-item py-8 md:py-12 px-4 font-elegant text-4xl md:text-6xl lg:text-8xl tracking-wider uppercase whitespace-nowrap`;
+                li.textContent = proj.name;
+                li.onclick = () => selectProject(index);
+                listEl.appendChild(li);
+            });
+        }
+
+        // Calculate and apply vertical translation to center the selected item
+        function updateRoulettePosition() {
+            const items = listEl.children;
+            if (!items.length) return;
+
+            // Mark active class
+            Array.from(items).forEach((item, idx) => {
+                if (idx === currentProjectIndex) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+
+            // Calculate exact centering
+            const viewportCenter = window.innerHeight / 2;
+            const activeItem = items[currentProjectIndex];
+            const itemCenterOffset = activeItem.offsetTop + (activeItem.offsetHeight / 2);
+            
+            const translateY = viewportCenter - itemCenterOffset;
+            listEl.style.transform = `translateY(${translateY}px)`;
+
+            // Update info
+            counterEl.textContent = `0${currentProjectIndex + 1} / 0${projects.length}`;
+            categoryEl.textContent = projects[currentProjectIndex].category;
+        }
+
+        // Set specific background image with crossfade
+        function setBackgroundImage(url) {
+            if (activeBgLayer === 1) {
+                // Load into layer 2, then fade it in, fade out layer 1
+                bgImg2.src = url;
+                bgImg2.onload = () => {
+                    bgImg2.classList.remove('opacity-0');
+                    bgImg2.classList.add('opacity-100');
+                    bgImg1.classList.remove('opacity-100');
+                    bgImg1.classList.add('opacity-0');
+                    activeBgLayer = 2;
+                };
+            } else {
+                // Load into layer 1, then fade it in, fade out layer 2
+                bgImg1.src = url;
+                bgImg1.onload = () => {
+                    bgImg1.classList.remove('opacity-0');
+                    bgImg1.classList.add('opacity-100');
+                    bgImg2.classList.remove('opacity-100');
+                    bgImg2.classList.add('opacity-0');
+                    activeBgLayer = 1;
+                };
+            }
+        }
+
+        // Loop images for the current project
+        function startSlideshow() {
+            clearInterval(slideInterval);
+            slideInterval = setInterval(() => {
+                const projectImages = projects[currentProjectIndex].images;
+                currentImageIndex = (currentImageIndex + 1) % projectImages.length;
+                setBackgroundImage(projectImages[currentImageIndex]);
+            }, 4000); // Change image every 4 seconds
+        }
+
+        // Handle project selection
+        function selectProject(index) {
+            if (index === currentProjectIndex) return; // Do nothing if clicking already active
+
+            currentProjectIndex = index;
+            currentImageIndex = 0; // Reset image index for new project
+            
+            updateRoulettePosition();
+            
+            // Immediately set first image of new project, then restart slideshow
+            setBackgroundImage(projects[currentProjectIndex].images[0]);
+            startSlideshow();
+        }
+
+        // Initialize application on load
+        window.addEventListener('load', () => {
+            initList();
+            
+            // Set initial images without animation for instant load feel
+            bgImg1.src = projects[0].images[0];
+            
+            // Small timeout ensures the DOM has rendered to get correct offsets for centering
+            setTimeout(() => {
+                updateRoulettePosition();
+                startSlideshow();
+            }, 100);
+        });
+
+        // Recalculate position if user resizes the window
+        window.addEventListener('resize', updateRoulettePosition);
+
+    </script>
+</body>
+</html>
