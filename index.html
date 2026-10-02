@@ -11,15 +11,20 @@
     <meta name="description" content="Portfólio audiovisual 2026">
     <meta name="author" content="Ronã Grangeiro">
 
-    <!-- Open Graph / Redes Sociais (WhatsApp, LinkedIn, etc.) CORRIGIDO PARA O LINK RAIZ -->
+    <!-- Open Graph / Redes Sociais -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ronaannn.github.io/">
     <meta property="og:title" content="Ronã Grangeiro | DOP">
     <meta property="og:description" content="Portfólio audiovisual 2026">
-    <!-- Imagem da capa na raiz -->
     <meta property="og:image" content="https://ronaannn.github.io/1_2.1.1.png">
 
-    <!-- Favicon (Ícone na aba do navegador) -->
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Ronã Grangeiro | DOP">
+    <meta name="twitter:description" content="Portfólio audiovisual 2026">
+    <meta name="twitter:image" content="https://ronaannn.github.io/1_2.1.1.png">
+
+    <!-- Favicon -->
     <link rel="icon" type="image/png" href="favicon.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -72,6 +77,8 @@
             opacity: 1;
             margin-top: 0.5rem;
         }
+        
+        /* ESTILO PADRÃO DOS PROJETOS */
         .sub-project-item {
             font-family: 'Inter', sans-serif;
             font-size: 1.1rem;
@@ -89,6 +96,40 @@
         }
         .sub-project-item:hover:not(.active-sub) {
             color: #ccc;
+        }
+
+        /* --- ANIMAÇÃO DE TREMER (CHAMADA PARA AÇÃO) --- */
+        @keyframes tremble {
+            0%, 100% { transform: translateX(0) rotate(0); }
+            2% { transform: translateX(-3px) rotate(-1deg); }
+            4% { transform: translateX(3px) rotate(1deg); }
+            6% { transform: translateX(-3px) rotate(-1deg); }
+            8% { transform: translateX(3px) rotate(1deg); }
+            10% { transform: translateX(0) rotate(0); }
+        }
+
+        /* ESTILO EXCLUSIVO PARA OS LINKS DE CONTATO */
+        .sub-project-item.contact-item {
+            font-size: 1.5rem; 
+            text-transform: none; 
+            letter-spacing: 0.05em;
+            font-weight: 400;
+            padding: 0.6rem 0; 
+            color: #aaa;
+            
+            /* Prepara o item para a animação */
+            display: block;
+            width: fit-content;
+            transform-origin: left center;
+            animation: tremble 6s infinite; /* Loop de 6 segundos */
+        }
+        .sub-project-item.contact-item.active-sub {
+            color: #fff;
+            padding-left: 1.2rem;
+            font-weight: 500; 
+        }
+        .sub-project-item.contact-item:hover:not(.active-sub) {
+            color: #eee;
         }
 
         #roulette-list {
@@ -193,7 +234,7 @@
                     { 
                         name: "sonhos", 
                         images: [
-                            { url: "1_2.1.1.png", time: 3000 }, 
+                            { url: "1_2.1.1.png", time: 7000 }, 
                             { url: "2.png", time: 3000 }
                         ] 
                     }
@@ -220,6 +261,26 @@
                         ] 
                     }
                 ]
+            },
+            {
+                categoryTitle: "CONTATO",
+                projects: [
+                    { 
+                        name: "whatsapp (11) 97508-5574", 
+                        link: "https://wa.me/5511975085574", 
+                        images: ["https://images.unsplash.com/photo-1596726229983-6f4a869801be?q=80&w=2070&auto=format&fit=crop"] 
+                    },
+                    { 
+                        name: "e-mail: ronan15pc@hotmail.com", 
+                        link: "mailto:ronan15pc@hotmail.com", 
+                        images: ["https://images.unsplash.com/photo-1596726229983-6f4a869801be?q=80&w=2070&auto=format&fit=crop"] 
+                    },
+                    { 
+                        name: "@ronannronan", 
+                        link: "https://instagram.com/ronannronan", 
+                        images: ["https://images.unsplash.com/photo-1596726229983-6f4a869801be?q=80&w=2070&auto=format&fit=crop"] 
+                    }
+                ]
             }
         ];
 
@@ -242,8 +303,10 @@
                 const liCat = document.createElement('li');
                 liCat.className = 'roulette-item pl-6 md:pl-16';
                 
+                const isContact = cat.categoryTitle === "CONTATO";
+                
                 const titleDiv = document.createElement('div');
-                titleDiv.className = 'font-elegant text-[7.5vw] md:text-5xl lg:text-6xl tracking-widest uppercase whitespace-nowrap';
+                titleDiv.className = 'cat-title-text font-elegant text-[7.5vw] md:text-5xl lg:text-6xl tracking-widest uppercase whitespace-nowrap transition-all duration-700 ease-in-out font-normal';
                 titleDiv.textContent = cat.categoryTitle;
                 titleDiv.onclick = () => selectCategory(cIndex);
                 
@@ -253,9 +316,27 @@
                 cat.projects.forEach((proj, pIndex) => {
                     const liSub = document.createElement('li');
                     liSub.className = 'sub-project-item';
+                    
+                    if (isContact) {
+                        liSub.classList.add('contact-item');
+                        // A MÁGICA DO LOOP: Atribui um atraso de 2 segundos para cada item tremer um a seguir ao outro!
+                        liSub.style.animationDelay = `${pIndex * 2}s`;
+                    }
+                    
                     liSub.textContent = proj.name;
                     liSub.onclick = (e) => {
                         e.stopPropagation(); 
+                        
+                        // Abre imediatamente o link se existir
+                        if (proj.link) {
+                            if (proj.link.startsWith('mailto:')) {
+                                window.location.href = proj.link;
+                            } else {
+                                window.open(proj.link, '_blank');
+                            }
+                        }
+                        
+                        // Fica selecionado como feedback visual
                         selectProject(cIndex, pIndex);
                     };
                     ulSub.appendChild(liSub);
@@ -276,15 +357,26 @@
 
             Array.from(items).forEach((item, idx) => {
                 const subItems = item.querySelectorAll('.sub-project-item');
+                const titleElement = item.querySelector('.cat-title-text');
+
                 if (idx === currentCatIndex) {
                     item.classList.add('active');
                     activeItemOffset = item.offsetTop + (item.offsetHeight / 2);
+                    
+                    if (portfolioData[idx].categoryTitle === "CONTATO") {
+                        titleElement.className = 'cat-title-text font-elegant text-[11vw] md:text-7xl lg:text-8xl tracking-[0.15em] uppercase whitespace-nowrap font-bold transition-all duration-700 ease-in-out';
+                    } else {
+                        titleElement.className = 'cat-title-text font-elegant text-[7.5vw] md:text-5xl lg:text-6xl tracking-widest uppercase whitespace-nowrap transition-all duration-700 ease-in-out font-normal';
+                    }
+
                     subItems.forEach((sub, sIdx) => {
+                        // Só adiciona o active-sub se o currentProjIndex bater (No contato ele começa no -1)
                         if (sIdx === currentProjIndex) sub.classList.add('active-sub');
                         else sub.classList.remove('active-sub');
                     });
                 } else {
                     item.classList.remove('active');
+                    titleElement.className = 'cat-title-text font-elegant text-[7.5vw] md:text-5xl lg:text-6xl tracking-widest uppercase whitespace-nowrap transition-all duration-700 ease-in-out font-normal';
                     subItems.forEach(sub => sub.classList.remove('active-sub'));
                 }
             });
@@ -299,13 +391,23 @@
             listEl.style.transform = `translate3d(0, ${translateY}px, 0)`;
 
             const currentCat = portfolioData[currentCatIndex];
-            const currentProj = currentCat.projects[currentProjIndex];
-            counterEl.textContent = `0${currentProjIndex + 1} / 0${currentCat.projects.length}`;
-            nameDisplayEl.textContent = currentProj.name;
+            
+            // Lógica para esconder o contador e limpar o subtítulo se for o contato sem seleção
+            if (currentCat.categoryTitle === "CONTATO") {
+                counterEl.style.opacity = '0';
+                nameDisplayEl.textContent = ""; 
+            } else {
+                const currentProj = currentCat.projects[currentProjIndex];
+                counterEl.style.opacity = '1';
+                counterEl.textContent = `0${currentProjIndex + 1} / 0${currentCat.projects.length}`;
+                nameDisplayEl.textContent = currentProj ? currentProj.name : "";
+            }
         }
 
         function playMedia() {
-            const proj = portfolioData[currentCatIndex].projects[currentProjIndex];
+            // Se o índice for -1 (Contato não selecionado), ele usa o fundo do primeiro item ([0])
+            const pIndex = currentProjIndex >= 0 ? currentProjIndex : 0;
+            const proj = portfolioData[currentCatIndex].projects[pIndex];
             
             if (proj.videoLocal) {
                 clearTimeout(slideTimeout);
@@ -349,7 +451,9 @@
 
         function startSlideshow() {
             clearTimeout(slideTimeout); 
-            const proj = portfolioData[currentCatIndex].projects[currentProjIndex];
+            // Usa o fallback para não dar erro se nenhum estiver selecionado
+            const pIndex = currentProjIndex >= 0 ? currentProjIndex : 0;
+            const proj = portfolioData[currentCatIndex].projects[pIndex];
             
             if (!proj.videoLocal && proj.images.length > 1) {
                 scheduleNextImage();
@@ -357,7 +461,8 @@
         }
 
         function scheduleNextImage() {
-            const proj = portfolioData[currentCatIndex].projects[currentProjIndex];
+            const pIndex = currentProjIndex >= 0 ? currentProjIndex : 0;
+            const proj = portfolioData[currentCatIndex].projects[pIndex];
             const currentImgData = proj.images[currentImageIndex];
             
             const duration = currentImgData.time || 4000;
@@ -376,7 +481,14 @@
         function selectCategory(cIndex) {
             if (cIndex === currentCatIndex) return; 
             currentCatIndex = cIndex;
-            currentProjIndex = 0; 
+            
+            // O SEGREDINHO: Se for a aba de contato, define como -1 para nenhum ficar selecionado!
+            if (portfolioData[cIndex].categoryTitle === "CONTATO") {
+                currentProjIndex = -1;
+            } else {
+                currentProjIndex = 0; 
+            }
+            
             currentImageIndex = 0;
             
             if (navigator.vibrate) navigator.vibrate(30);
@@ -388,6 +500,7 @@
         }
 
         function selectProject(cIndex, pIndex) {
+            // Se já está selecionado, apenas sai (o clique no link já foi tratado na origem)
             if (cIndex === currentCatIndex && pIndex === currentProjIndex) return;
             
             currentCatIndex = cIndex;
