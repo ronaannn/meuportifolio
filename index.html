@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minimalist Portfolio</title>
+    <title>Portfolio - Direção de Fotografia</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,39 +15,65 @@
             padding: 0;
             width: 100%;
             height: 100%;
-            overflow: hidden; /* Fix screen, no scroll */
+            overflow: hidden;
             background-color: #000;
             color: #fff;
             font-family: 'Inter', sans-serif;
         }
 
-        .font-elegant {
-            font-family: 'Cinzel', serif;
-        }
+        .font-elegant { font-family: 'Cinzel', serif; }
 
         .roulette-item {
-            transition: opacity 0.5s ease, transform 0.5s ease;
-            opacity: 0.2;
-            cursor: pointer;
-            transform: scale(0.9);
+            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            opacity: 0.15;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
             transform-origin: left center;
         }
-
         .roulette-item.active {
             opacity: 1;
-            transform: scale(1.1);
         }
-
         .roulette-item:hover:not(.active) {
-            opacity: 0.6;
+            opacity: 0.5;
+            cursor: pointer;
         }
 
-        /* Smooth transition for the vertical list */
+        .sub-projects {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
+            opacity: 0;
+            margin-top: 0;
+        }
+        .roulette-item.active .sub-projects {
+            max-height: 500px; 
+            opacity: 1;
+            margin-top: 0.5rem;
+        }
+        .sub-project-item {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 300;
+            text-transform: lowercase;
+            letter-spacing: 0.1em;
+            padding: 0.3rem 0;
+            color: #888;
+            transition: color 0.3s ease, padding-left 0.3s ease;
+            cursor: pointer;
+        }
+        .sub-project-item.active-sub {
+            color: #fff;
+            padding-left: 1rem; 
+        }
+        .sub-project-item:hover:not(.active-sub) {
+            color: #ccc;
+        }
+
         #roulette-list {
-            transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
             position: absolute;
             top: 0;
-            left: 0;
+            left: 20px;
             width: 100%;
             list-style: none;
             padding: 0;
@@ -63,153 +89,218 @@
             object-fit: cover;
         }
 
-        /* Dark gradient overlay to ensure text readability */
         .overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(90deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.3) 100%);
+            background: linear-gradient(90deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.1) 100%);
             z-index: 10;
         }
     </style>
 </head>
 <body class="relative antialiased selection:bg-white selection:text-black">
 
-    <!-- Background Images Container -->
     <div id="bg-container" class="absolute inset-0 z-0">
-        <!-- Two image layers for smooth crossfading -->
+        <!-- Camadas de Imagem para crossfade -->
         <img id="bg-img-1" class="bg-layer opacity-100" src="" alt="Background 1">
         <img id="bg-img-2" class="bg-layer opacity-0" src="" alt="Background 2">
+        
+        <!-- Camada de Vídeo Local (Pronta para uso futuro) -->
+        <video id="bg-video" class="bg-layer opacity-0 object-cover w-full h-full absolute inset-0 z-0 transition-opacity duration-1000" autoplay loop muted playsinline></video>
+
         <div class="overlay"></div>
     </div>
 
-    <!-- Content Overlay -->
     <div class="relative z-20 w-full h-full flex flex-col pointer-events-none">
-        
-        <!-- Header / Logo -->
         <header class="p-8 md:p-12 absolute top-0 left-0 w-full flex justify-between items-center z-30 pointer-events-auto">
             <div class="text-xs tracking-[0.3em] uppercase font-light">Studio <br> <span class="font-bold">Aura</span></div>
             <div class="text-xs tracking-widest uppercase font-light">Selected Works</div>
         </header>
 
-        <!-- Main Roulette Area -->
-        <main class="flex-1 relative w-full md:w-1/2 pl-8 md:pl-24 lg:pl-32 h-full">
-            <!-- This list will be translated vertically -->
+        <main class="flex-1 relative w-full md:w-2/3 pl-8 md:pl-16 h-full">
             <ul id="roulette-list" class="pointer-events-auto">
-                <!-- Items injected via JS -->
+                <!-- Injetado via JS -->
             </ul>
         </main>
 
-        <!-- Dynamic Counter/Info (Bottom Right) -->
         <div class="absolute bottom-8 right-12 z-30 pointer-events-auto text-right">
             <div id="project-counter" class="text-sm font-light tracking-widest mb-1">01 / 05</div>
-            <div id="project-category" class="text-xs text-gray-400 tracking-[0.2em] uppercase">Architecture</div>
+            <div id="project-name-display" class="text-xs text-gray-400 tracking-[0.2em] uppercase">LIBERVITA</div>
         </div>
     </div>
 
     <script>
-        // Project Data with specific Unsplash high-quality image IDs for minimalist aesthetics
-        const projects = [
+        const portfolioData = [
             {
-                name: "Monolith",
-                category: "Architecture",
-                images: [
-                    "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop",
-                    "https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=2069&auto=format&fit=crop",
-                    "https://images.unsplash.com/photo-1481253127861-534498168948?q=80&w=1973&auto=format&fit=crop"
+                categoryTitle: "FASHION FILM",
+                projects: [
+                    { 
+                        name: "libervita", 
+                        images: [
+                            "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070&auto=format&fit=crop",
+                            "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=1976&auto=format&fit=crop"
+                        ] 
+                    },
+                    { 
+                        name: "micélio", 
+                        images: [
+                            "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1920&auto=format&fit=crop",
+                            "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop"
+                        ] 
+                    }
                 ]
             },
             {
-                name: "Noir Silhouette",
-                category: "Fashion",
-                images: [
-                    "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070&auto=format&fit=crop",
-                    "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=1976&auto=format&fit=crop",
-                    "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1920&auto=format&fit=crop"
+                categoryTitle: "VIDEOCLIPE",
+                projects: [
+                    { 
+                        name: "stand-it", 
+                        images: [
+                            "https://images.unsplash.com/photo-1519608487953-e999c86e7455?q=80&w=2070&auto=format&fit=crop",
+                            "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop"
+                        ] 
+                    }
                 ]
             },
             {
-                name: "Void Elements",
-                category: "Abstract Concept",
-                images: [
-                    "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop",
-                    "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1964&auto=format&fit=crop",
-                    "https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?q=80&w=1974&auto=format&fit=crop"
+                categoryTitle: "CURTA-METRAGEM",
+                projects: [
+                    { 
+                        name: "sonhos", 
+                        // IMAGEM LOCAL ADICIONADA AQUI:
+                        images: ["1_2.1.1.png"] 
+                    }
                 ]
             },
             {
-                name: "Serene Spaces",
-                category: "Interior Design",
-                images: [
-                    "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=1974&auto=format&fit=crop",
-                    "https://images.unsplash.com/photo-1600607687920-4e2a09be15b5?q=80&w=2070&auto=format&fit=crop",
-                    "https://images.unsplash.com/photo-1593696140826-c58b021acf8b?q=80&w=2070&auto=format&fit=crop"
+                categoryTitle: "SHOW",
+                projects: [
+                    { name: "kyan", images: ["https://images.unsplash.com/photo-1540039155733-d76e6f48ce65?q=80&w=2070&auto=format&fit=crop"] },
+                    { name: "kayblack", images: ["https://images.unsplash.com/photo-1470229722913-7c092b321a1b?q=80&w=2070&auto=format&fit=crop"] },
+                    { name: "sá e guarabyra", images: ["https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1974&auto=format&fit=crop"] },
+                    { name: "yunk vino", images: ["https://images.unsplash.com/photo-1520166012956-add9ba0ee3f4?q=80&w=2070&auto=format&fit=crop"] },
+                    { name: "danzo", images: ["https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop"] }
                 ]
             },
             {
-                name: "Lumina",
-                category: "Light Art",
-                images: [
-                    "https://images.unsplash.com/photo-1550684376-efcbd6e3f031?q=80&w=2070&auto=format&fit=crop",
-                    "https://images.unsplash.com/photo-1519608487953-e999c86e7455?q=80&w=2070&auto=format&fit=crop",
-                    "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop"
+                categoryTitle: "DOCUMENTÁRIO",
+                projects: [
+                    { 
+                        name: "pertencer", 
+                        images: [
+                            "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=2070&auto=format&fit=crop",
+                            "https://images.unsplash.com/photo-1604085572504-a392ddf0d86a?q=80&w=2070&auto=format&fit=crop"
+                        ] 
+                    }
                 ]
             }
         ];
 
-        let currentProjectIndex = 0;
+        let currentCatIndex = 0;
+        let currentProjIndex = 0;
         let currentImageIndex = 0;
-        let activeBgLayer = 1; // 1 or 2 to manage crossfades
+        let activeBgLayer = 1;
         let slideInterval;
+        let isAnimatingScroll = false;
 
         const listEl = document.getElementById('roulette-list');
         const bgImg1 = document.getElementById('bg-img-1');
         const bgImg2 = document.getElementById('bg-img-2');
+        const bgVideo = document.getElementById('bg-video');
         const counterEl = document.getElementById('project-counter');
-        const categoryEl = document.getElementById('project-category');
+        const nameDisplayEl = document.getElementById('project-name-display');
 
-        // Initialize the list
         function initList() {
-            projects.forEach((proj, index) => {
-                const li = document.createElement('li');
-                // Give items large spacing so the roulette feel is emphasized
-                li.className = `roulette-item py-8 md:py-12 px-4 font-elegant text-4xl md:text-6xl lg:text-8xl tracking-wider uppercase whitespace-nowrap`;
-                li.textContent = proj.name;
-                li.onclick = () => selectProject(index);
-                listEl.appendChild(li);
+            portfolioData.forEach((cat, cIndex) => {
+                const liCat = document.createElement('li');
+                liCat.className = 'roulette-item pl-8 md:pl-16';
+                
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'font-elegant text-4xl md:text-5xl lg:text-6xl tracking-widest uppercase whitespace-nowrap';
+                titleDiv.textContent = cat.categoryTitle;
+                titleDiv.onclick = () => selectCategory(cIndex);
+                
+                const ulSub = document.createElement('ul');
+                ulSub.className = 'sub-projects list-none pl-4';
+                
+                cat.projects.forEach((proj, pIndex) => {
+                    const liSub = document.createElement('li');
+                    liSub.className = 'sub-project-item';
+                    liSub.textContent = proj.name;
+                    liSub.onclick = (e) => {
+                        e.stopPropagation(); 
+                        selectProject(cIndex, pIndex);
+                    };
+                    ulSub.appendChild(liSub);
+                });
+
+                liCat.appendChild(titleDiv);
+                liCat.appendChild(ulSub);
+                listEl.appendChild(liCat);
             });
         }
 
-        // Calculate and apply vertical translation to center the selected item
         function updateRoulettePosition() {
             const items = listEl.children;
             if (!items.length) return;
 
-            // Mark active class
+            const viewportCenter = window.innerHeight / 2;
+            let activeItemOffset = 0;
+
             Array.from(items).forEach((item, idx) => {
-                if (idx === currentProjectIndex) {
+                const subItems = item.querySelectorAll('.sub-project-item');
+                if (idx === currentCatIndex) {
                     item.classList.add('active');
+                    activeItemOffset = item.offsetTop + (item.offsetHeight / 2);
+                    subItems.forEach((sub, sIdx) => {
+                        if (sIdx === currentProjIndex) sub.classList.add('active-sub');
+                        else sub.classList.remove('active-sub');
+                    });
                 } else {
                     item.classList.remove('active');
+                    subItems.forEach(sub => sub.classList.remove('active-sub'));
                 }
             });
 
-            // Calculate exact centering
-            const viewportCenter = window.innerHeight / 2;
-            const activeItem = items[currentProjectIndex];
-            const itemCenterOffset = activeItem.offsetTop + (activeItem.offsetHeight / 2);
-            
-            const translateY = viewportCenter - itemCenterOffset;
+            const translateY = viewportCenter - activeItemOffset;
+
+            Array.from(items).forEach((item, idx) => {
+                const scale = idx === currentCatIndex ? 1 : 0.85;
+                item.style.transform = `scale(${scale})`;
+            });
+
             listEl.style.transform = `translateY(${translateY}px)`;
 
-            // Update info
-            counterEl.textContent = `0${currentProjectIndex + 1} / 0${projects.length}`;
-            categoryEl.textContent = projects[currentProjectIndex].category;
+            const currentCat = portfolioData[currentCatIndex];
+            const currentProj = currentCat.projects[currentProjIndex];
+            counterEl.textContent = `0${currentProjIndex + 1} / 0${currentCat.projects.length}`;
+            nameDisplayEl.textContent = currentProj.name;
         }
 
-        // Set specific background image with crossfade
-        function setBackgroundImage(url) {
+        // --- SISTEMA DE MÍDIA NATIVA (FOTOS E VÍDEOS LOCAIS) ---
+        function playMedia() {
+            const proj = portfolioData[currentCatIndex].projects[currentProjIndex];
+            
+            if (proj.videoLocal) {
+                clearInterval(slideInterval);
+                if (!bgVideo.src.endsWith(proj.videoLocal)) {
+                    bgVideo.src = proj.videoLocal;
+                }
+                bgVideo.classList.remove('opacity-0');
+                bgVideo.classList.add('opacity-100');
+            } else {
+                bgVideo.classList.remove('opacity-100');
+                bgVideo.classList.add('opacity-0');
+                setTimeout(() => { 
+                    if (bgVideo.classList.contains('opacity-0')) bgVideo.src = ""; 
+                }, 1000);
+                
+                changeImage(proj.images[0]);
+                startSlideshow();
+            }
+        }
+
+        function changeImage(url) {
             if (activeBgLayer === 1) {
-                // Load into layer 2, then fade it in, fade out layer 1
                 bgImg2.src = url;
                 bgImg2.onload = () => {
                     bgImg2.classList.remove('opacity-0');
@@ -219,7 +310,6 @@
                     activeBgLayer = 2;
                 };
             } else {
-                // Load into layer 1, then fade it in, fade out layer 2
                 bgImg1.src = url;
                 bgImg1.onload = () => {
                     bgImg1.classList.remove('opacity-0');
@@ -231,47 +321,71 @@
             }
         }
 
-        // Loop images for the current project
         function startSlideshow() {
             clearInterval(slideInterval);
-            slideInterval = setInterval(() => {
-                const projectImages = projects[currentProjectIndex].images;
-                currentImageIndex = (currentImageIndex + 1) % projectImages.length;
-                setBackgroundImage(projectImages[currentImageIndex]);
-            }, 4000); // Change image every 4 seconds
+            const proj = portfolioData[currentCatIndex].projects[currentProjIndex];
+            if (!proj.videoLocal && proj.images.length > 1) {
+                slideInterval = setInterval(() => {
+                    currentImageIndex = (currentImageIndex + 1) % proj.images.length;
+                    changeImage(proj.images[currentImageIndex]);
+                }, 4000);
+            }
         }
 
-        // Handle project selection
-        function selectProject(index) {
-            if (index === currentProjectIndex) return; // Do nothing if clicking already active
-
-            currentProjectIndex = index;
-            currentImageIndex = 0; // Reset image index for new project
+        function selectCategory(cIndex) {
+            if (cIndex === currentCatIndex) return; 
+            currentCatIndex = cIndex;
+            currentProjIndex = 0; 
+            currentImageIndex = 0;
             
-            updateRoulettePosition();
-            
-            // Immediately set first image of new project, then restart slideshow
-            setBackgroundImage(projects[currentProjectIndex].images[0]);
-            startSlideshow();
-        }
-
-        // Initialize application on load
-        window.addEventListener('load', () => {
-            initList();
-            
-            // Set initial images without animation for instant load feel
-            bgImg1.src = projects[0].images[0];
-            
-            // Small timeout ensures the DOM has rendered to get correct offsets for centering
             setTimeout(() => {
                 updateRoulettePosition();
-                startSlideshow();
+                playMedia();
+            }, 50);
+        }
+
+        function selectProject(cIndex, pIndex) {
+            currentCatIndex = cIndex;
+            currentProjIndex = pIndex;
+            currentImageIndex = 0;
+            
+            updateRoulettePosition();
+            playMedia();
+        }
+
+        function handleNavigation(direction) {
+            if (isAnimatingScroll) return;
+            if (direction === 'down' && currentCatIndex < portfolioData.length - 1) {
+                isAnimatingScroll = true;
+                selectCategory(currentCatIndex + 1);
+            } else if (direction === 'up' && currentCatIndex > 0) {
+                isAnimatingScroll = true;
+                selectCategory(currentCatIndex - 1);
+            }
+            setTimeout(() => { isAnimatingScroll = false; }, 800);
+        }
+
+        window.addEventListener('wheel', (e) => {
+            if (Math.abs(e.deltaY) < 30) return; 
+            handleNavigation(e.deltaY > 0 ? 'down' : 'up');
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown') handleNavigation('down');
+            if (e.key === 'ArrowUp') handleNavigation('up');
+        });
+
+        window.addEventListener('load', () => {
+            initList();
+            bgImg1.src = portfolioData[0].projects[0].images[0]; 
+            
+            setTimeout(() => {
+                updateRoulettePosition();
+                playMedia();
             }, 100);
         });
 
-        // Recalculate position if user resizes the window
         window.addEventListener('resize', updateRoulettePosition);
-
     </script>
 </body>
 </html>
