@@ -26,11 +26,13 @@
         .font-elegant { font-family: 'Cinzel', serif; }
 
         .roulette-item {
-            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            /* Animação ultra fluida com cubic-bezier mais suave */
+            transition: opacity 0.8s ease, transform 1s cubic-bezier(0.22, 1, 0.36, 1);
             opacity: 0.15;
             padding-top: 1rem;
             padding-bottom: 1rem;
             transform-origin: left center;
+            will-change: transform, opacity; /* Prepara a placa de vídeo */
         }
         .roulette-item.active {
             opacity: 1;
@@ -43,9 +45,11 @@
         .sub-projects {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
+            /* A gaveta abre sincronizada com a roleta */
+            transition: max-height 1s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease;
             opacity: 0;
             margin-top: 0;
+            will-change: max-height, opacity;
         }
         .roulette-item.active .sub-projects {
             max-height: 500px; 
@@ -72,7 +76,8 @@
         }
 
         #roulette-list {
-            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            /* O coração da fluidez da lista principal */
+            transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1);
             position: absolute;
             top: 0;
             left: 0;
@@ -80,6 +85,7 @@
             list-style: none;
             padding: 0;
             margin: 0;
+            will-change: transform; /* Força aceleração de Hardware (GPU) */
         }
 
         .bg-layer {
@@ -89,6 +95,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            will-change: opacity;
         }
 
         .overlay {
@@ -171,7 +178,7 @@
                     { 
                         name: "sonhos", 
                         images: [
-                            { url: "1_2.1.1.png", time: 3000 }, 
+                            { url: "1_2.1.1.png", time: 7000 }, 
                             { url: "2.png", time: 3000 }
                         ] 
                     }
@@ -271,10 +278,12 @@
 
             Array.from(items).forEach((item, idx) => {
                 const scale = idx === currentCatIndex ? 1 : 0.85;
+                // Uso do translate3d para forçar aceleração por Hardware na GPU
                 item.style.transform = `scale(${scale})`;
             });
 
-            listEl.style.transform = `translateY(${translateY}px)`;
+            // Aplica a transição vertical acelerada por hardware
+            listEl.style.transform = `translate3d(0, ${translateY}px, 0)`;
 
             const currentCat = portfolioData[currentCatIndex];
             const currentProj = currentCat.projects[currentProjIndex];
@@ -357,8 +366,6 @@
             currentProjIndex = 0; 
             currentImageIndex = 0;
             
-            // --- VIBRAÇÃO HÁPTICA ---
-            // Aciona uma vibração de 30 milissegundos se o navegador suportar
             if (navigator.vibrate) navigator.vibrate(30);
             
             setTimeout(() => {
@@ -368,14 +375,12 @@
         }
 
         function selectProject(cIndex, pIndex) {
-            // Evita rodar código e vibrar se clicar no mesmo projeto
             if (cIndex === currentCatIndex && pIndex === currentProjIndex) return;
             
             currentCatIndex = cIndex;
             currentProjIndex = pIndex;
             currentImageIndex = 0;
             
-            // --- VIBRAÇÃO HÁPTICA ---
             if (navigator.vibrate) navigator.vibrate(30);
 
             updateRoulettePosition();
@@ -391,7 +396,8 @@
                 isAnimatingScroll = true;
                 selectCategory(currentCatIndex - 1);
             }
-            setTimeout(() => { isAnimatingScroll = false; }, 800);
+            // Sincronizado para 1000ms (1 segundo) que é o novo tempo da animação CSS
+            setTimeout(() => { isAnimatingScroll = false; }, 1000); 
         }
 
         window.addEventListener('wheel', (e) => {
