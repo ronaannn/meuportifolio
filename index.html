@@ -301,40 +301,34 @@
             }
         }
 
-        // --- SISTEMA CORRIGIDO DE TROCA DE IMAGENS ---
+        // --- FORÇANDO A TROCA DE IMAGEM SEM TRAVAS DE SEGURANÇA ---
         function changeImage(url) {
-            const nextImg = activeBgLayer === 1 ? bgImg2 : bgImg1;
-            const currentImg = activeBgLayer === 1 ? bgImg1 : bgImg2;
-
-            // Limpa qualquer carregamento pendente anterior
-            nextImg.onload = null;
-            nextImg.src = url;
-
-            const applyTransition = () => {
-                nextImg.classList.remove('opacity-0');
-                nextImg.classList.add('opacity-100');
-                currentImg.classList.remove('opacity-100');
-                currentImg.classList.add('opacity-0');
-                activeBgLayer = activeBgLayer === 1 ? 2 : 1;
-            };
-
-            // Se a imagem já estiver salva no cache do celular, troca instantaneamente
-            if (nextImg.complete) {
-                applyTransition();
+            if (activeBgLayer === 1) {
+                bgImg2.src = url;
+                bgImg2.classList.remove('opacity-0');
+                bgImg2.classList.add('opacity-100');
+                bgImg1.classList.remove('opacity-100');
+                bgImg1.classList.add('opacity-0');
+                activeBgLayer = 2;
             } else {
-                // Se precisar baixar, aguarda finalizar para não gerar tela preta
-                nextImg.onload = applyTransition;
+                bgImg1.src = url;
+                bgImg1.classList.remove('opacity-0');
+                bgImg1.classList.add('opacity-100');
+                bgImg2.classList.remove('opacity-100');
+                bgImg2.classList.add('opacity-0');
+                activeBgLayer = 1;
             }
         }
 
         function startSlideshow() {
             clearInterval(slideInterval);
             const proj = portfolioData[currentCatIndex].projects[currentProjIndex];
+            // Só ativa o intervalo se tiver mais de uma imagem
             if (!proj.videoLocal && proj.images.length > 1) {
                 slideInterval = setInterval(() => {
                     currentImageIndex = (currentImageIndex + 1) % proj.images.length;
                     changeImage(proj.images[currentImageIndex]);
-                }, 4000);
+                }, 4000); // Força a troca a cada 4 segundos
             }
         }
 
@@ -404,8 +398,6 @@
 
         window.addEventListener('load', () => {
             initList();
-            bgImg1.src = portfolioData[0].projects[0].images[0]; 
-            
             setTimeout(() => {
                 updateRoulettePosition();
                 playMedia();
