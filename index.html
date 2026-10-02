@@ -171,9 +171,8 @@
                     { 
                         name: "sonhos", 
                         images: [
-                            // Podes usar este formato para definir o tempo de cada uma! (1000 = 1 segundo)
-                            { url: "1_2.1.1.png", time: 5000 }, 
-                            { url: "2.png", time: 2000 }
+                            { url: "1_2.1.1.png", time: 7000 }, 
+                            { url: "2.png", time: 3000 }
                         ] 
                     }
                 ]
@@ -206,7 +205,7 @@
         let currentProjIndex = 0;
         let currentImageIndex = 0;
         let activeBgLayer = 1;
-        let slideTimeout; // Modificado de Interval para Timeout
+        let slideTimeout; 
         let isAnimatingScroll = false;
 
         const listEl = document.getElementById('roulette-list');
@@ -300,7 +299,6 @@
                     if (bgVideo.classList.contains('opacity-0')) bgVideo.src = ""; 
                 }, 1000);
                 
-                // Trata a imagem para caso seja um objeto com tempo ou só o nome direto
                 const firstImg = proj.images[0];
                 const firstUrl = typeof firstImg === 'string' ? firstImg : firstImg.url;
                 
@@ -327,9 +325,8 @@
             }
         }
 
-        // --- NOVO SISTEMA DE TEMPO DINÂMICO ---
         function startSlideshow() {
-            clearTimeout(slideTimeout); // Limpa contagens anteriores
+            clearTimeout(slideTimeout); 
             const proj = portfolioData[currentCatIndex].projects[currentProjIndex];
             
             if (!proj.videoLocal && proj.images.length > 1) {
@@ -341,27 +338,28 @@
             const proj = portfolioData[currentCatIndex].projects[currentProjIndex];
             const currentImgData = proj.images[currentImageIndex];
             
-            // Lê o tempo da imagem atual (ou usa 4000 como padrão caso não tenha sido definido)
             const duration = currentImgData.time || 4000;
 
             slideTimeout = setTimeout(() => {
                 currentImageIndex = (currentImageIndex + 1) % proj.images.length;
                 const nextImgData = proj.images[currentImageIndex];
                 
-                // Extrai o link (independentemente de ser objeto de tempo ou string normal)
                 const nextUrl = typeof nextImgData === 'string' ? nextImgData : nextImgData.url;
                 
                 changeImage(nextUrl);
-                scheduleNextImage(); // Inicia a contagem para a imagem seguinte
+                scheduleNextImage(); 
             }, duration);
         }
-        // --------------------------------------
 
         function selectCategory(cIndex) {
             if (cIndex === currentCatIndex) return; 
             currentCatIndex = cIndex;
             currentProjIndex = 0; 
             currentImageIndex = 0;
+            
+            // --- VIBRAÇÃO HÁPTICA ---
+            // Aciona uma vibração de 30 milissegundos se o navegador suportar
+            if (navigator.vibrate) navigator.vibrate(30);
             
             setTimeout(() => {
                 updateRoulettePosition();
@@ -370,10 +368,16 @@
         }
 
         function selectProject(cIndex, pIndex) {
+            // Evita rodar código e vibrar se clicar no mesmo projeto
+            if (cIndex === currentCatIndex && pIndex === currentProjIndex) return;
+            
             currentCatIndex = cIndex;
             currentProjIndex = pIndex;
             currentImageIndex = 0;
             
+            // --- VIBRAÇÃO HÁPTICA ---
+            if (navigator.vibrate) navigator.vibrate(30);
+
             updateRoulettePosition();
             playMedia();
         }
@@ -424,7 +428,6 @@
         window.addEventListener('load', () => {
             initList();
             
-            // Carrega a primeira imagem de forma segura verificando o tipo
             const firstProj = portfolioData[0].projects[0];
             const bgImg1 = document.getElementById('bg-img-1');
             if (!firstProj.videoLocal) {
